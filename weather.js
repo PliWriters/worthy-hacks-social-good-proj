@@ -2,119 +2,97 @@ const url =
 	'https://api.openweathermap.org/data/2.5/weather';
 const apiKey =
 	'f00c38e0279b7bc85480c3fe775d518c';
+// state
+let currCity = "London";
+let units = "metric";
 
+// Selectors
+let city = document.querySelector(".weather__city");
+let datetime = document.querySelector(".weather__datetime");
+let weather__forecast = document.querySelector('.weather__forecast');
+let weather__temperature = document.querySelector(".weather__temperature");
+let weather__icon = document.querySelector(".weather__icon");
+let weather__minmax = document.querySelector(".weather__minmax")
+let weather__realfeel = document.querySelector('.weather__realfeel');
+let weather__humidity = document.querySelector('.weather__humidity');
+let weather__wind = document.querySelector('.weather__wind');
+let weather__pressure = document.querySelector('.weather__pressure');
 
-const city = 'Lagos'; // Replace with your desired city
-const units = 'metric'; // Use 'imperial' for Fahrenheit
+// search
+document.querySelector(".weather__search").addEventListener('submit', e => {
+    let search = document.querySelector(".weather__searchform");
+    // prevent default action
+    e.preventDefault();
+    // change current city
+    currCity = search.value;
+    // get weather forecast 
+    getWeather();
+    // clear form
+    search.value = ""
+})
 
-const getWeather = async (city) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${units}`;
-    
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status} ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        console.log("json file", data);
-        console.log(`Weather in ${data.name}:`);
-        console.log(`Temperature: ${data.main.temp}°C`);
-        console.log(`Weather: ${data.weather[0].description}`);
-        console.log(`Humidity: ${data.main.humidity}%`);
-        console.log(`Wind Speed: ${data.wind.speed} m/s`);
-    } catch (error) {
-        console.error(error);
+// units
+document.querySelector(".weather_unit_celsius").addEventListener('click', () => {
+    if (units !== "metric") {
+        // change to metric
+        units = "metric"
+        // get weather forecast 
+        getWeather()
     }
-};
+})
 
-getWeather(city);
-const wrapper = document.querySelector(".wrapper"),
-    inputPart = document.querySelector(".input-part"),
-    infoTxt = inputPart.querySelector(".info-txt"),
-    inputField = inputPart.querySelector("input"),
-    locationBtn = inputPart.querySelector("button"),
-    weatherPart = wrapper.querySelector(".weather-part"),
-    wIcon = weatherPart.querySelector("img"),
-    arrowBack = wrapper.querySelector("header i");
-
-let api;
-
-inputField.addEventListener("keyup", e => {
-    if (e.key == "Enter" && inputField.value != "") {
-        requestApi(inputField.value);
+document.querySelector(".weather_unit_farenheit").addEventListener('click', () => {
+    if (units !== "imperial") {
+        // change to imperial
+        units = "imperial"
+        // get weather forecast 
+        getWeather()
     }
-});
+})
 
-locationBtn.addEventListener("click", () => {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(onSuccess, onError);
-    } else {
-        alert("Your browser not support geolocation api");
+function convertTimeStamp(timestamp, timezone) {
+    const convertTimezone = timezone / 3600; // convert seconds to hours 
+
+    const date = new Date(timestamp * 1000);
+
+    const options = {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        timeZone: `Etc/GMT${convertTimezone >= 0 ? "-" : "+"}${Math.abs(convertTimezone)}`,
+        hour12: true,
     }
-});
+    return date.toLocaleString("en-US", options)
 
-function requestApi(city) {
-    api = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=your_api_key`;
-    fetchData();
 }
 
-function onSuccess(position) {
-    const { latitude, longitude } = position.coords;
-    api = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=your_api_key`;
-    fetchData();
+
+
+// convert country code to name
+function convertCountryCode(country) {
+    let regionNames = new Intl.DisplayNames(["en"], { type: "region" });
+    return regionNames.of(country)
 }
 
-function onError(error) {
-    infoTxt.innerText = error.message;
-    infoTxt.classList.add("error");
+function getWeather() {
+    const API_KEY = '64f60853740a1ee3ba20d0fb595c97d5'
+
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${currCity}&appid=${API_KEY}&units=${units}`).then(res => res.json()).then(data => {
+        console.log(data)
+        city.innerHTML = `${data.name}, ${convertCountryCode(data.sys.country)}`
+        datetime.innerHTML = convertTimeStamp(data.dt, data.timezone);
+        weather__forecast.innerHTML = `<p>${data.weather[0].main}`
+        weather__temperature.innerHTML = `${data.main.temp.toFixed()}&#176`
+        weather__icon.innerHTML = `   <img src="http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png" />`
+        weather__minmax.innerHTML = `<p>Min: ${data.main.temp_min.toFixed()}&#176</p><p>Max: ${data.main.temp_max.toFixed()}&#176</p>`
+        weather__realfeel.innerHTML = `${data.main.feels_like.toFixed()}&#176`
+        weather__humidity.innerHTML = `${data.main.humidity}%`
+        weather__wind.innerHTML = `${data.wind.speed} ${units === "imperial" ? "mph": "m/s"}`
+        weather__pressure.innerHTML = `${data.main.pressure} hPa`
+    })
 }
 
-function fetchData() {
-    infoTxt.innerText = "Getting weather details...";
-    infoTxt.classList.add("pending");
-    fetch(api).then(res => res.json()).then(result => weatherDetails(result)).catch(() => {
-        infoTxt.innerText = "Something went wrong";
-        infoTxt.classList.replace("pending", "error");
-    });
-}
-
-function weatherDetails(info) {
-    if (info.cod == "404") {
-        infoTxt.classList.replace("pending", "error");
-        infoTxt.innerText = `${inputField.value} isn't a valid city name`;
-    } else {
-        const city = info.name;
-        const country = info.sys.country;
-        const { description, id } = info.weather[0];
-        const { temp, feels_like, humidity } = info.main;
-
-        if (id == 800) {
-            wIcon.src = "icons/clear.svg";
-        } else if (id >= 200 && id <= 232) {
-            wIcon.src = "icons/storm.svg";
-        } else if (id >= 600 && id <= 622) {
-            wIcon.src = "icons/snow.svg";
-        } else if (id >= 701 && id <= 781) {
-            wIcon.src = "icons/haze.svg";
-        } else if (id >= 801 && id <= 804) {
-            wIcon.src = "icons/cloud.svg";
-        } else if ((id >= 500 && id <= 531) || (id >= 300 && id <= 321)) {
-            wIcon.src = "icons/rain.svg";
-        }
-
-        weatherPart.querySelector(".temp .numb").innerText = Math.floor(temp);
-        weatherPart.querySelector(".weather").innerText = description;
-        weatherPart.querySelector(".location span").innerText = `${city}, ${country}`;
-        weatherPart.querySelector(".temp .numb-2").innerText = Math.floor(feels_like);
-        weatherPart.querySelector(".humidity span").innerText = `${humidity}%`;
-        infoTxt.classList.remove("pending", "error");
-        infoTxt.innerText = "";
-        inputField.value = "";
-        wrapper.classList.add("active");
-    }
-}
-
-arrowBack.addEventListener("click", () => {
-    wrapper.classList.remove("active");
-});
+document.body.addEventListener('load', getWeather())

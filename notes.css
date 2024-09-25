@@ -8,7 +8,10 @@ body {
    height: 100%;
    width: 100%;
    color: #fff;
-   background-color: #000;
+  background-color: #000;
+  position: fixed;
+  top: 0%;
+  left: 0%;
 }
 header, #modal-header {
     height: 44px;
@@ -76,11 +79,12 @@ header p {
     height: 100%;
     width: 100%;
     color: #fff;
-    background-color: #000;
+    background: transparent;
     position: fixed;
     top: 0%;
     left: 0%;
     display: none;
+    background-color: #000;
 }
 #modal.active {
     display: block;
@@ -117,10 +121,10 @@ overflow-y: scroll;
 }
 #inputT {
  height: 40px;
- width: 90%;
+ width: 96%;
  border: solid 2px blue;
  border-radius: 10px;
- margin: 5%;
+ margin: 2%;
  color: #fff;
  background-color: #000;
  font-size: 18px;
@@ -189,7 +193,8 @@ overflow-y: mandatory;
 text-align: left;
 font-size: 20px;
 font-weight: 550;
-margin-bottom: 5px;
+margin-top: 5px;
+margin-bottom: 10px;
 }
 .note p {
  text-align: left;

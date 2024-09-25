@@ -8,7 +8,7 @@ body {
    height: 100%;
    width: 100%;
    color: #fff;
-   background-color: #000;
+   background: #000;
 }
 header, #modal-header {
     height: 44px;
@@ -27,7 +27,7 @@ header  #menu, #modal-header span {
     position: fixed;
     left: 5%;
 }
-header p {
+header p, #modal-header p {
     font-size: 20px;
     font-weight: 550;
 }
@@ -38,12 +38,13 @@ header p {
     right: 5%;
 }
 #bannerimg {
-    margin-top: 50px;
+    margin-top: 10px;
     height: 250px;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow-y: scroll;
 }
 #container {
     margin-top: 10px;
@@ -146,6 +147,7 @@ overflow-y: scroll;
     gap: 3%;
     overflow: auto;
     overflow-y: scroll;
+    visibility: hidden;
 }
 #inputT {
  height: 40px;
@@ -263,10 +265,50 @@ padding: 5px;
     border: none;
     color: #fff;
     background-color: #000;
+    border-radius: 20px;
+    padding: 5px;
+    outline: none;
+}
+#input::placeholder {
+    color: #fff;
+}
+#input::focus {
+    outline: none;
 }
 #inp span {
     height: 40px;
-    width: 18%;
+    width: 20%;
     border-radius: 20px;
     background-color: #400FF9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#bannerimg h2 {
+width: 100%;
+padding: 5px;
+margin-top: 10px;
+margin-bottom: 10px;
+font-family: 'Amazing';
+font-size: 20px;
+font-weight: 540;
+}
+#bannerimg p {
+    padding: 5px;
+    font-family: 'Amazing';
+    font-size: 18px;
+    font-weight: 520;
+    line-height: 1.58;
+}
+#appointments {
+    height: 100%;
+    width: 100%;
+    color: #fff;
+    background-color: #000;
+    overflow-y: scroll;
+}
+#createloc {
+    height: 40px;
+    width: 120px;
+    
 }
